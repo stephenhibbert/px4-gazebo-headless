@@ -30,10 +30,19 @@ RUN apt-get update && \
                        python3-numpy \
                        python3-pip \
                        unzip \
+                       xfce4-terminal \
+                       devilspie \
+                       # Install deps for QGC
+                       libglib2.0-0 \
+                       gstreamer1.0-libav \
+                       gstreamer1.0-gl \
+                       libqt5gui5 \
                        xvfb && \
     apt-get -y autoremove && \
     apt-get clean autoclean && \
     rm -rf /var/lib/apt/lists/{apt,dpkg,cache,log} /tmp/* /var/tmp/*
+
+ENV QT_X11_NO_MITSHM=1
 
 RUN pip3 install --upgrade pip && \
     pip3 install empy \
@@ -58,6 +67,19 @@ RUN ["/bin/bash", "-c", " \
     DONT_RUN=1 make px4_sitl gazebo && \
     DONT_RUN=1 make px4_sitl gazebo \
 "]
+
+
+RUN apt-get remove modemmanager -y
+RUN apt-get install libpulse-dev libpulse-mainloop-glib0 -y
+ADD https://d176tv9ibo4jno.cloudfront.net/latest/QGroundControl.AppImage .
+RUN chmod +x ./QGroundControl.AppImage
+RUN NO_CLEANUP=1 ./QGroundControl.AppImage --appimage-extract
+
+RUN addgroup appgroup
+RUN adduser appuser
+RUN adduser appuser appgroup
+RUN adduser appuser dialout
+RUN chown -R appuser:appgroup /squashfs-root
 
 COPY sitl_rtsp_proxy ${SITL_RTSP_PROXY}
 RUN cmake -B${SITL_RTSP_PROXY}/build -H${SITL_RTSP_PROXY}
