@@ -63,4 +63,4 @@ COPY sitl_rtsp_proxy ${SITL_RTSP_PROXY}
 RUN cmake -B${SITL_RTSP_PROXY}/build -H${SITL_RTSP_PROXY}
 RUN cmake --build ${SITL_RTSP_PROXY}/build
 
-ENTRYPOINT ["/root/entrypoint.sh"]
+CMD ["/root/entrypoint.sh"]
